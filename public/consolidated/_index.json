@@ -20,6 +20,16 @@
         "subLanguages": []
     },
     {
+        "name": "DART",
+        "icon": "/icons/dart.svg",
+        "subLanguages": []
+    },
+    {
+        "name": "FLUTTER",
+        "icon": "/icons/flutter.svg",
+        "subLanguages": []
+    },
+    {
         "name": "HASKELL",
         "icon": "/icons/haskell.svg",
         "subLanguages": []

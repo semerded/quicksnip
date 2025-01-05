@@ -1,0 +1,19 @@
+[
+    {
+        "name": "Basics",
+        "snippets": [
+            {
+                "title": "Hello World!",
+                "description": "Prints \"Hello world!\" in the terminal.",
+                "author": "semerded",
+                "tags": [
+                    "printing",
+                    "hello-world",
+                    "basics"
+                ],
+                "contributors": [],
+                "code": "void main() {\n    print(\"Hello world!\");\n}\n"
+            }
+        ]
+    }
+]

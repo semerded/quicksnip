@@ -1,0 +1,69 @@
+[
+    {
+        "name": "Navigator",
+        "snippets": [
+            {
+                "title": "Swipe animated route",
+                "description": "Add a swipe animation to a page switch route. Can swipe left or right",
+                "author": "semerded",
+                "tags": [
+                    "navigator",
+                    "page",
+                    "animation"
+                ],
+                "contributors": [],
+                "code": "enum Direction {\n  left,\n  right,\n  up,\n  down,\n}\n\nRoute swipeAnimatedRoute(Widget page, Direction direction) {\n  assert(direction == Direction.left || direction == Direction.right); // direction up or down not permitted\n  return PageRouteBuilder(\n    pageBuilder: (context, animation, secondaryAnimation) => page,\n    transitionsBuilder: (context, animation, secondaryAnimation, child) {\n      Offset begin;\n      const Offset end = Offset.zero;\n      if (direction == Direction.left) {\n        begin = const Offset(1.0, 0.0);\n      } else {\n        begin = const Offset(-1.0, 0.0);\n      }\n\n      const Curve curve = Curves.ease;\n\n      Animatable<Offset> tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));\n\n      return SlideTransition(\n        position: animation.drive(tween),\n        child: child,\n      );\n    },\n  );\n}\n"
+            },
+            {
+                "title": "Switch screen",
+                "description": "Switch to a different screen and wait for a return value from that screen",
+                "author": "semerded",
+                "tags": [
+                    "navigator",
+                    "page"
+                ],
+                "contributors": [],
+                "code": "Navigator.push(,\n    context,\n    MaterialPageRoute<bool>(, // change bool if you want to return another datatype\n\t    builder: (context) => Page(), // add your page here\n            ),\n\t\t).then((callback) {\n\t\tif (callback != null && callback) {\n\t\t    // do something with callback\n\t\t}\n});\n"
+            }
+        ]
+    },
+    {
+        "name": "Widgets",
+        "snippets": [
+            {
+                "title": "Attention Floating Action Button",
+                "description": "A floating action button that seeks attention by doing an up and down animation. This can be enabled/disabled with a boolean value.",
+                "author": "semerded",
+                "tags": [
+                    "widget",
+                    "animation",
+                    "button"
+                ],
+                "contributors": [],
+                "code": "import 'package:flutter/material.dart';\n\nclass AddButtonAnimated extends StatefulWidget {\n  final VoidCallback onPressed;\n  final Widget child;\n  final Color backgroundColor;\n  final bool animateWhen; // animate under a certain condition\n  final String? heroTag;\n  const AddButtonAnimated({\n    required this.child\n    required this.backgroundColor,\n    required this.animateWhen,\n    required this.onPressed,\n    this.heroTag,\n    super.key,\n  });\n\n  @override\n  State<AddButtonAnimated> createState() => _AddButtonAnimatedState();\n}\n\nclass _AddButtonAnimatedState extends State<AddButtonAnimated> with SingleTickerProviderStateMixin {\n  late final Animation<Offset> slideAnimation;\n  late final Animation<double> scaleAnimation;\n  late final Animation<double> fadeAnimation;\n  late AnimationController animationController;\n\n  @override\n  void initState() {\n    super.initState();\n    animationController = AnimationController(\n      duration: const Duration(milliseconds: 2000),\n      vsync: this,\n    )..repeat();\n    slideAnimation = TweenSequence<Offset>(\n      [\n        TweenSequenceItem<Offset>(\n            tween: Tween<Offset>(\n              begin: Offset.zero,\n              end: const Offset(0, -0.2),\n            ),\n            weight: 2),\n        TweenSequenceItem<Offset>(\n            tween: Tween<Offset>(\n              begin: const Offset(0, -0.2),\n              end: Offset.zero,\n            ).chain(\n              CurveTween(curve: Curves.linear),\n            ),\n            weight: 2),\n        TweenSequenceItem<Offset>(\n            tween: Tween<Offset>(\n              begin: Offset.zero,\n              end: const Offset(0, -0.2),\n            ),\n            weight: 2),\n        TweenSequenceItem<Offset>(\n            tween: Tween<Offset>(\n              begin: const Offset(0, -0.2),\n              end: Offset.zero,\n            ).chain(\n              CurveTween(curve: Curves.linear),\n            ),\n            weight: 2),\n        TweenSequenceItem<Offset>(\n            tween: Tween<Offset>(\n              begin: Offset.zero,\n              end: Offset.zero,\n            ).chain(\n              CurveTween(curve: Curves.linear),\n            ),\n            weight: 14),\n      ],\n    ).animate(animationController);\n  }\n\n  @override\n  Widget build(BuildContext context) {\n    if (widget.animateWhen) {\n      animationController.repeat();\n    } else {\n      animationController.reset();\n      animationController.stop();\n    }\n    return SlideTransition(\n      position: slideAnimation,\n      child: FloatingActionButton(\n        elevation: 5,\n        backgroundColor: widget.backgroundColor,\n        heroTag: widget.heroTag,\n        onPressed: () {\n          widget.onPressed();\n        },\n        child: widget.child,\n      ),\n    );\n  }\n}\n\n"
+            },
+            {
+                "title": "Elevated progress button",
+                "description": "Adds an elevated button with a certain progress.",
+                "author": "semerded",
+                "tags": [
+                    "widget",
+                    "progress"
+                ],
+                "contributors": [],
+                "code": "import 'package:flutter/material.dart';\n\nclass ProgressElevatedButton extends StatefulWidget {\n  final GlobalKey buttonKey = GlobalKey();\n\n  final VoidCallback onPressed;\n  final VoidCallback? onLongPress;\n  final ValueChanged<bool>? onHover;\n  final ValueChanged<bool>? onFocusChange;\n  final ButtonStyle? style;\n  final FocusNode? focusNode;\n  final bool autofocus;\n  final Clip? clipBehavior;\n  final WidgetStatesController? statesController;\n  final Widget child;\n  final double progress;\n  final IconAlignment iconAlignment;\n  final Color progressColor;\n\n  ProgressElevatedButton({\n    super.key,\n    required this.onPressed,\n    this.onLongPress,\n    this.onHover,\n    this.onFocusChange,\n    this.style,\n    this.focusNode,\n    this.autofocus = false,\n    this.clipBehavior,\n    this.statesController,\n    required this.child,\n    required this.progress,\n    required this.progressColor,\n    this.iconAlignment = IconAlignment.start,\n  });\n\n  @override\n  State<ProgressElevatedButton> createState() => _ProgressElevatedButtonState();\n}\n\nclass _ProgressElevatedButtonState extends State<ProgressElevatedButton> {\n  @override\n  Widget build(BuildContext context) {\n    return ElevatedButton(\n      key: widget.buttonKey,\n      onPressed: widget.onPressed,\n      autofocus: widget.autofocus,\n      clipBehavior: widget.clipBehavior,\n      focusNode: widget.focusNode,\n      iconAlignment: widget.iconAlignment,\n      onFocusChange: widget.onFocusChange,\n      onHover: widget.onHover,\n      onLongPress: widget.onLongPress,\n      statesController: widget.statesController,\n      style: widget.style,\n      child: Stack(\n        alignment: Alignment.center,\n        children: [\n          CustomPaint(\n            painter: ProgressPainter(buttonKey: widget.buttonKey, progress: widget.progress, paintColor: widget.progressColor),\n          ),\n          widget.child\n        ],\n      ),\n    );\n  }\n}\n\nclass ProgressPainter extends CustomPainter {\n  const ProgressPainter({\n    required this.progress,\n    required this.buttonKey,\n    required this.paintColor,\n  });\n\n  final double progress;\n  final GlobalKey buttonKey;\n  final Color paintColor;\n\n  @override\n  void paint(Canvas canvas, Size size) {\n    // Using the [buttonKey] to get the runtime size of the parent [AsyncOutlinedBtn] button\n    final buttonSize = buttonKey.currentContext?.size;\n\n    if (buttonSize == null) return;\n\n    canvas.clipRRect(\n      RRect.fromRectAndRadius(\n        Rect.fromCenter(\n          center: Offset.zero,\n          width: buttonSize.width,\n          height: buttonSize.height - 8, //? account for overflow\n        ),\n\n        // This radius is same as button border raius.\n        // If you prefer, you can pass down this value from the main button.\n        const Radius.circular(100),\n      ),\n    );\n    canvas.drawRect(\n      Rect.fromLTWH(\n        // Top left\n        -buttonSize.width / 2,\n        -buttonSize.height / 2,\n\n        // if progress = 0.5, background will take 50% of button size\n        buttonSize.width * progress,\n        buttonSize.height,\n      ),\n      Paint()..color = paintColor,\n    );\n  }\n\n  @override\n  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;\n}\n"
+            },
+            {
+                "title": "One side progress border",
+                "description": "Adds a border to one side of a widget with a certain progress.",
+                "author": "semerded",
+                "tags": [
+                    "widget",
+                    "progress"
+                ],
+                "contributors": [],
+                "code": "class OneSideProgressBorderPainter extends CustomPainter {\n  final double progress;\n  final Color color;\n  final double strokeWidth;\n  final borderSide side; // Added to determine which side to paint\n\n  OneSideProgressBorderPainter({\n    required this.progress,\n    required this.color,\n    required this.strokeWidth,\n    required this.side,\n  });\n\n  @override\n  void paint(Canvas canvas, Size size) {\n    final Paint paint = Paint()\n      ..color = color\n      ..strokeWidth = strokeWidth\n      ..style = PaintingStyle.stroke;\n\n    final Path path = Path();\n\n    // Draw progress on the specified border side\n    if (side == borderSide.top) {\n      final double progressWidth = progress * size.width;\n      path.moveTo(0, 0);\n      path.lineTo(progressWidth, 0);\n    } else if (side == borderSide.bottom) {\n      final double progressWidth = progress * size.width;\n      path.moveTo(0, size.height);\n      path.lineTo(progressWidth, size.height);\n    } else if (side == borderSide.left) {\n      final double progressHeight = progress * size.height;\n      path.moveTo(0, 0);\n      path.lineTo(0, progressHeight);\n    } else if (side == borderSide.right) {\n      final double progressHeight = progress * size.height;\n      path.moveTo(size.width, 0);\n      path.lineTo(size.width, progressHeight);\n    }\n\n    canvas.drawPath(path, paint);\n  }\n\n  @override\n  bool shouldRepaint(covariant CustomPainter oldDelegate) {\n    return true;\n  }\n}\n\nenum borderSide { top, bottom, left, right }\n"
+            }
+        ]
+    }
+]
